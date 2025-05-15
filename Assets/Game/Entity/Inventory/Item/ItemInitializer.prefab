@@ -1,0 +1,118 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8469730900642782260
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8469730900642782262}
+  - component: {fileID: 8469730900642782263}
+  - component: {fileID: -5133463838319867498}
+  - component: {fileID: -4501760611538615899}
+  m_Layer: 0
+  m_Name: ItemInitializer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8469730900642782262
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8469730900642782260}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8469730900642782263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8469730900642782260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c7f86647061db44a8488872080533fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  _networkLevel: {fileID: 0}
+  _items:
+  - {fileID: 2922079700991277890, guid: 8f967500741c5d841a033c4c649f469b, type: 3}
+  - {fileID: 6163998885029246843, guid: 3cf19d59f1ead58489808f3068a52ae6, type: 3}
+  - {fileID: 5346705776664805723, guid: 057502591f7db7f46b4f6a2920782b16, type: 3}
+  - {fileID: 7483650333941601223, guid: 254d5aaf102170f4ea053f60619bae99, type: 3}
+  - {fileID: 8207489889606294136, guid: 74564fedfb41786408381f238bfd5a42, type: 3}
+  - {fileID: 3121961262542868922, guid: 40ccba25d5650da428872c2300c60c07, type: 3}
+  - {fileID: 7924566195823865883, guid: ef9bd899dbacf1a49a6f6c94af6c37c3, type: 3}
+  - {fileID: 416938125056045049, guid: 45d27560e1d91184ca456b997552fd0d, type: 3}
+  - {fileID: 5739526246041925211, guid: 054576194fc9fd44e8eb2e1a8bbe5f96, type: 3}
+  - {fileID: 8609362602551384755, guid: 3f4e74f9debe0284fbc90621753cb772, type: 3}
+  - {fileID: 1202706434274483777, guid: b5d93698e439bf645bc47e8aba7a8090, type: 3}
+  - {fileID: 8519693122035435468, guid: d680858de517cbf4f998af3156cf61ed, type: 3}
+  - {fileID: 3411281800420798106, guid: cf67a43790f16b0449ba3a70f3cf64a4, type: 3}
+  - {fileID: 4505445762240541129, guid: a2da100b44a9fa24b90e50771474a3c2, type: 3}
+  - {fileID: 4378813087246804132, guid: be88b918a3bb3f34ca999305edf0a24e, type: 3}
+--- !u!114 &-5133463838319867498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8469730900642782260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  _assetId: 860660268
+  serverOnly: 0
+  visibility: 0
+  hasSpawned: 0
+--- !u!114 &-4501760611538615899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8469730900642782260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ff3ba0becae47b8b9381191598957c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 1
+  syncMode: 0
+  syncInterval: 0
+  target: {fileID: 8469730900642782262}
+  syncPosition: 1
+  syncRotation: 1
+  syncScale: 0
+  onlySyncOnChange: 1
+  compressRotation: 1
+  interpolatePosition: 1
+  interpolateRotation: 1
+  interpolateScale: 1
+  coordinateSpace: 0
+  timelineOffset: 1
+  showGizmos: 0
+  showOverlay: 0
+  overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
+  onlySyncOnChangeCorrectionMultiplier: 2
+  rotationSensitivity: 0.01
+  positionPrecision: 0.01
+  scalePrecision: 0.01
