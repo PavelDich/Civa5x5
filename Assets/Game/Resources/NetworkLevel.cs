@@ -36,46 +36,19 @@ namespace Minicop.Game.GravityRave
                 Debug.Log("Local Player Find");
             }
         }
-        public SyncList<NetworkIdentity> Players = new SyncList<NetworkIdentity>();
+        public List<NetworkIdentity> Connections = new List<NetworkIdentity>();
         public UnityEvent OnLocalConnectionLeave = new UnityEvent();
         public UnityEvent OnLocalConnectionEnter = new UnityEvent();
         public UnityEvent OnConnectionEnter = new UnityEvent();
         public UnityEvent OnConnectionLeave = new UnityEvent();
-        public UnityEvent<NetworkIdentity> OnPlayerSpawned = new UnityEvent<NetworkIdentity>();
-        public UnityEvent<NetworkIdentity> OnPlayerRemove = new UnityEvent<NetworkIdentity>();
         [SyncVar]
         public int RoomId = 0;
         [SyncVar]
         public int SceneId = 0;
-        public bool IsRoom = false;
-        public NetworkIdentity Player;
 
         private void Start()
         {
             NetworkManager.OnPlayerDisconnect.AddListener(SrvRemovePlayer);
-        }
-        [Client]
-        public void SpawnPlayer()
-        {
-            if (IsRoom && NetworkClient.active)
-            {
-                CmdSpawnPlayer(LocalConnection, SceneId);
-            }
-        }
-        [Command(requiresAuthority = false)]
-        private void CmdSpawnPlayer(NetworkIdentity owner, int id)
-        {
-            Vector3 spawn = _spawns[Random.Range(0, _spawns.Length - 1)].position;
-            NetworkIdentity go = _diContainer.InstantiatePrefab(Player, spawn, Quaternion.identity, null).GetComponent<NetworkIdentity>();
-            SceneManager.MoveGameObjectToScene(go.gameObject, _networkManager.ActiveRooms[id]);
-
-            NetworkServer.Spawn(go.gameObject, owner.connectionToClient);
-            Players.Add(go);
-        }
-        [TargetRpc]
-        private void RpcSpawnPlayer(NetworkConnection conn, NetworkIdentity player)
-        {
-            OnPlayerSpawned.Invoke(player);
         }
 
         private void OnEnable()
@@ -84,11 +57,15 @@ namespace Minicop.Game.GravityRave
             OnLocalConnectionEnter.Invoke();
         }
 
+        private void OnDisable()
+        {
+            OnLocalConnectionLeave.Invoke();
+        }
+
         public IEnumerator WaitSpawnPlayer()
         {
             yield return new WaitForEndOfFrame();
             FindPlayers();
-            SpawnPlayer();
         }
         public void FindPlayers()
         {
@@ -126,53 +103,17 @@ namespace Minicop.Game.GravityRave
             IEnumerator Remove()
             {
                 yield return new WaitForEndOfFrame();
-                Players.RemoveAll(p => p == null);
+                Connections.RemoveAll(p => p == null);
             }
-        }
-
-
-        public void Open(int id)
-        {
-            CmdOpen(LocalConnection, id);
-        }
-        [Command(requiresAuthority = false)]
-        public void CmdOpen(NetworkIdentity networkIdentity, int id)
-        {
-            Debug.Log($"LoadRoom ({id})");
-            _networkManager.ConnectToRoom(networkIdentity, id);
-        }
-
-        public void LeaveRoom()
-        {
-            FindPlayers();
-            OnLocalConnectionLeave.Invoke();
-            CmdLeaveRoom(LocalConnection);
-        }
-        [Command(requiresAuthority = false)]
-        public void CmdLeaveRoom(NetworkIdentity networkIdentity)
-        {
-            SrvRemovePlayer(networkIdentity);
-            _networkManager.LeaveOfRoom(networkIdentity);
         }
 
         [Server]
         public void SrvRemovePlayer(NetworkIdentity networkIdentity)
         {
-            NetworkIdentity player = Players.Find(player => player.connectionToClient == networkIdentity.connectionToClient);
-            Players.Remove(player);
+            NetworkIdentity player = Connections.Find(player => player.connectionToClient == networkIdentity.connectionToClient);
+            Connections.Remove(player);
             Destroy(player.gameObject);
             NetworkServer.Destroy(player.gameObject);
-        }
-
-
-        public void OnAccept()
-        {
-            CmdOnAccept(LocalConnection);
-        }
-        [Command(requiresAuthority = false)]
-        public void CmdOnAccept(NetworkIdentity networkIdentity)
-        {
-            DatabaseHandler.OnAccept.Invoke(networkIdentity);
         }
 
         public void Quit()

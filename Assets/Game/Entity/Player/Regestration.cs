@@ -17,21 +17,27 @@ namespace Minicop.Game.GravityRave
         public DatabaseHandler _databaseHandler;
 
 
-        public GameObject UI;
-        public TMP_InputField RegistrtionEmail;
-        public TMP_InputField RegistrtionPassword;
-        public TMP_InputField RegistrtionLogin;
-        public TMP_InputField EnterLogin;
-        public TMP_InputField EnterPassword;
+        public string Email
+        {
+            get { return UserData.Email; }
+            set { UserData.Email = value; }
+        }
+        public string Login
+        {
+            get { return UserData.Login; }
+            set { UserData.Login = value; }
+        }
+        public string Password
+        {
+            get { return UserData.Password; }
+            set { UserData.Password = value; }
+        }
 
         public void Registration()
         {
-            Config.Data.MySQLClientUser = RegistrtionEmail.text;
-            Config.Data.MySQLClientPassword = RegistrtionPassword.text;
-            Config.Data.MySQLClientLogin = RegistrtionLogin.text;
-            JSONController.Save(Config.Data, "Config");
+            JSONController.Save(UserData, "UserRegestrationData");
 
-            CmdRegistration(NetworkLevel.LocalConnection, RegistrtionEmail.text, RegistrtionPassword.text, RegistrtionLogin.text);
+            CmdRegistration(NetworkLevel.LocalConnection, Email, Password, Login);
         }
         [Command(requiresAuthority = false)]
         void CmdRegistration(NetworkIdentity networkIdentity, string email, string password, string login)
@@ -40,39 +46,28 @@ namespace Minicop.Game.GravityRave
         }
         public void Enter()
         {
-            Config.Data.MySQLClientPassword = EnterPassword.text;
-            Config.Data.MySQLClientLogin = EnterLogin.text;
-            JSONController.Save(Config.Data, "Config");
+            JSONController.Save(UserData, "UserRegestrationData");
 
-            CmdEnter(NetworkLevel.LocalConnection, EnterPassword.text, EnterLogin.text);
+            CmdEnter(NetworkLevel.LocalConnection, Email, Password, Login);
         }
         [Command(requiresAuthority = false)]
-        void CmdEnter(NetworkIdentity networkIdentity, string password, string login)
+        void CmdEnter(NetworkIdentity networkIdentity, string email, string password, string login)
         {
-            _databaseHandler.CheckUser(networkIdentity, password, login);
+            _databaseHandler.CheckUser(networkIdentity, email, password, login);
         }
 
         private void Start()
         {
-            RegistrtionEmail.text = Config.Data.MySQLClientUser;
-            RegistrtionPassword.text = Config.Data.MySQLClientPassword;
-            RegistrtionLogin.text = Config.Data.MySQLClientLogin;
-            EnterPassword.text = Config.Data.MySQLClientPassword;
-            EnterLogin.text = Config.Data.MySQLClientLogin;
-            DatabaseHandler.OnAccept.AddListener(Open);
-            //NetworkManager.OnSubSceneLoad.AddListener(Open);
+            JSONController.Load(ref UserData, "UserRegestrationData");
         }
 
-        [Server]
-        public void Open(NetworkIdentity networkIdentity)
+        public static UserDataStruct UserData = new UserDataStruct();
+        [System.Serializable]
+        public struct UserDataStruct
         {
-            RpcOpen(networkIdentity.connectionToClient);
-            _networkManager.LeaveOfRoom(networkIdentity);
-        }
-        [TargetRpc]
-        public void RpcOpen(NetworkConnectionToClient conn)
-        {
-            UI.SetActive(false);
+            public string Email;
+            public string Password;
+            public string Login;
         }
     }
 }

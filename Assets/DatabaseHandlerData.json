@@ -1,0 +1,8 @@
+{
+    "IsActive": true,
+    "IpAdress": "localhost",
+    "Port": "3306",
+    "Name": "civa5x5",
+    "UserName": "root",
+    "UserPassword": ""
+}

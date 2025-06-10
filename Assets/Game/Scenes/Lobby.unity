@@ -206,7 +206,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1161764712}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Minicop.Game.GravityRave.Lobby, Assembly-CSharp
         m_MethodName: Open
         m_Mode: 3
@@ -475,8 +475,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1161764712}
-        m_TargetAssemblyTypeName: Minicop.Game.GravityRave.Lobby, Assembly-CSharp
+      - m_Target: {fileID: 1161764710}
+        m_TargetAssemblyTypeName: Minicop.Game.GravityRave.NetworkLevel, Assembly-CSharp
         m_MethodName: Open
         m_Mode: 3
         m_Arguments:
@@ -609,7 +609,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1161764712}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Minicop.Game.GravityRave.Lobby, Assembly-CSharp
         m_MethodName: Open
         m_Mode: 3
@@ -743,8 +743,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1161764712}
-        m_TargetAssemblyTypeName: Minicop.Game.GravityRave.Lobby, Assembly-CSharp
+      - m_Target: {fileID: 1161764710}
+        m_TargetAssemblyTypeName: Minicop.Game.GravityRave.NetworkLevel, Assembly-CSharp
         m_MethodName: Open
         m_Mode: 3
         m_Arguments:
@@ -1069,7 +1069,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1161764712}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Minicop.Game.GravityRave.Lobby, Assembly-CSharp
         m_MethodName: Open
         m_Mode: 3
@@ -1451,8 +1451,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1161764712}
-        m_TargetAssemblyTypeName: Minicop.Game.GravityRave.Lobby, Assembly-CSharp
+      - m_Target: {fileID: 1161764710}
+        m_TargetAssemblyTypeName: Minicop.Game.GravityRave.NetworkLevel, Assembly-CSharp
         m_MethodName: Open
         m_Mode: 3
         m_Arguments:
@@ -1990,7 +1990,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1161764712}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Minicop.Game.GravityRave.Lobby, Assembly-CSharp
         m_MethodName: Open
         m_Mode: 3
@@ -2580,24 +2580,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7349440665211705389, guid: 8cef0e9cb4cff4f4ca83a88301b0957e, type: 3}
   m_PrefabInstance: {fileID: 1161764709}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1161764712
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1161764711}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c4bdb07fe1e9a1548b1d38bb0347242c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
-  _networkManager: {fileID: 0}
-  _networkLevel: {fileID: 0}
-  UI: {fileID: 1177381111}
 --- !u!114 &1161764713
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2617,6 +2599,28 @@ MonoBehaviour:
   ClientObjects:
   - {fileID: 1177381111}
   ServerObjects: []
+--- !u!114 &1161764714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1161764711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0ea60a3fd78dc845be6e8d439021fba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  _networkManager: {fileID: 0}
+  OnRoomAdd:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRoomRemove:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1177381111
 GameObject:
   m_ObjectHideFlags: 0
@@ -2803,7 +2807,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1161764712}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Minicop.Game.GravityRave.Lobby, Assembly-CSharp
         m_MethodName: Open
         m_Mode: 3
@@ -3019,7 +3023,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1161764712}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Minicop.Game.GravityRave.Lobby, Assembly-CSharp
         m_MethodName: Open
         m_Mode: 3
@@ -3423,7 +3427,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1161764712}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Minicop.Game.GravityRave.Lobby, Assembly-CSharp
         m_MethodName: Open
         m_Mode: 3

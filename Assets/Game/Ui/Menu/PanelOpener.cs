@@ -13,7 +13,7 @@ namespace Minicop.Game.GravityRave
             Open(StartPanelId);
         }
 
-        private void Open(int id)
+        public void Open(int id)
         {
             foreach (var panel in Panels)
             {

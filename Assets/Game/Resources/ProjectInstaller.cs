@@ -19,7 +19,6 @@ namespace Minicop.Game.GravityRave
         {
             //Container.Bind<NeedObj>().FromNew().AsSingle();
             //Container.Bind<NetworkManager>().FromComponentInNewPrefab(_networkManager).AsSingle().NonLazy();
-            JSONController.Load(ref Config.Data,  "Config");
             Container.Bind<NetworkManager>().FromComponentInHierarchy(_networkManager).AsSingle().NonLazy();
             Container.Bind<KcpTransport>().FromComponentInHierarchy(_kcpTransport).AsSingle().NonLazy();
             Container.Bind<DatabaseHandler>().FromComponentInHierarchy(_databaseHandler).AsSingle().NonLazy();

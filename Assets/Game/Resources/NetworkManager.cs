@@ -122,9 +122,12 @@ namespace Minicop.Game.GravityRave
             [Scene]
             public string Scene;
         }
+
         public static UnityEvent<NetworkIdentity> OnSubSceneLoad = new UnityEvent<NetworkIdentity>();
         [SerializeField, HideInInspector]
         private int _countActiveScenes = 1;
+
+
         [SerializeField]
         public List<Room> RoomScenes = new List<Room>();
         [SerializeField]
@@ -258,7 +261,6 @@ namespace Minicop.Game.GravityRave
         public void ConnectToRoom(NetworkIdentity networkIdentity, int id)
         {
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
-            Debug.Log($"Scene {networkIdentity == null} 0 obj");
             OnSubSceneLoad.Invoke(networkIdentity);
             StartCoroutine(RoomConecting(networkIdentity.connectionToClient, id));
 #endif
@@ -271,7 +273,6 @@ namespace Minicop.Game.GravityRave
             conn.Send(new SceneMessage { sceneName = RoomScenes[id].Scene, sceneOperation = SceneOperation.LoadAdditive });
 
             SceneManager.MoveGameObjectToScene(conn.identity.gameObject, ActiveRooms[id]);
-            //            ActiveRooms[id].GetRootGameObjects()[0].GetComponent<NetworkLevel>().PlayerConnected(conn.identity);
 #endif
             yield return null;
         }
@@ -285,7 +286,7 @@ namespace Minicop.Game.GravityRave
             NetworkServer.SendToAll(new SceneMessage { sceneName = LobbyScenes.Scene, sceneOperation = SceneOperation.UnloadAdditive });
             StartCoroutine(ServerUnloadSubScenes());
         }
-        IEnumerator ServerUnloadSubScenes()
+        private IEnumerator ServerUnloadSubScenes()
         {
             for (int index = 0; index < ActiveRooms.Count; index++)
                 if (ActiveRooms[index].IsValid())
@@ -328,13 +329,8 @@ namespace Minicop.Game.GravityRave
             conn.Send(new SceneMessage { sceneName = LobbyScenes.Scene, sceneOperation = SceneOperation.LoadAdditive });
 
             SceneManager.MoveGameObjectToScene(conn.identity.gameObject, ActiveLobbys[0]);
-            //ClientUnloadOfSubScenes();
 #endif
             yield return null;
         }
     }
-}
-public struct PosMessage : NetworkMessage
-{
-    public string PlayerName;
 }

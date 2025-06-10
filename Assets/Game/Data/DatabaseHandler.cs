@@ -12,51 +12,59 @@ using Mirror;
 using MySql.Data.MySqlClient;
 using Zenject;
 using UnityEngine.Events;
+using TMPro;
 
 namespace Minicop.Game.GravityRave
 {
 	public class DatabaseHandler : MonoBehaviour
 	{
-		public static UnityEvent<NetworkIdentity> OnAccept = new UnityEvent<NetworkIdentity>();
+		public UnityEvent<NetworkIdentity> RegisterDenied = new UnityEvent<NetworkIdentity>();
+		public UnityEvent<NetworkIdentity> RegisterAllowed = new UnityEvent<NetworkIdentity>();
+		public UnityEvent<NetworkIdentity> EnterDenied = new UnityEvent<NetworkIdentity>();
+		public UnityEvent<NetworkIdentity> EnterAllowed = new UnityEvent<NetworkIdentity>();
 		[Inject]
 		public NetworkManager _networkManager;
-		private string connectionString;
-		private MySqlConnection conn = null;
-		private MySqlCommand cmd = null;
-		private MySqlDataReader rdr = null;
+		private string _connectionString;
+		private MySqlConnection _conn = null;
 		public int Id;
 
 		private MD5 _md5Hash;
 
 		void Start()
 		{
+			JSONController.Load(ref Data, "DatabaseHandlerData");
+
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-			if (!Config.Data.MySQLIsActive) return;
+
+			if (!Data.IsActive) return;
+
 
 			DataBaseOpen();
+
 			try
 			{
-				IDbCommand cmd = conn.CreateCommand();
-				string sql =
-					"SELECT Email, Password,Login " +
-					"FROM user";
-				cmd.CommandText = sql;
+				MySqlCommand cmd = _conn.CreateCommand();
+				cmd.CommandText = "select * from users;";
 
-				IDataReader reader = cmd.ExecuteReader();
-				while (reader.Read())
+				MySqlDataReader rdr = cmd.ExecuteReader();
+				if (rdr.HasRows)
 				{
-					string Email = (string)reader["Email"];
-					string Password = (string)reader["Password"];
-					string Login = (string)reader["Login"];
+					while (rdr.Read())
+					{
+						int id = rdr.GetInt32("Id");
+						string login = rdr.GetString("Login");
+						string email = rdr.GetString("Email");
+						string password = rdr.GetString("Password");
 
-
-					Debug.Log($"LoadData: {Email}, {Password}, {Login}");
+						Debug.Log($"LoadData: {id} {email}, {password}, {login}");
+					}
 				}
 			}
 			catch (Exception ex)
 			{
 				Debug.Log($"{ex.ToString()}");
 			}
+
 			DataBaseClose();
 #endif
 		}
@@ -70,10 +78,9 @@ namespace Minicop.Game.GravityRave
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
 			try
 			{
-				conn = new MySqlConnection("server=213.176.246.76;database=into_the_night_db;port=3306;user=root;password=donotkys84;");
-				//conn = new MySqlConnection("server=localhost;database=into_the_night_bd;port=3306;user=root;password=donotkys84;");
+				_conn = new MySqlConnection($"server={Data.IpAdress};uid={Data.UserName};pwd={Data.UserPassword};database={Data.Name}");
 				Debug.Log($"Connecting...");
-				conn.Open();
+				_conn.Open();
 			}
 			catch (Exception ex)
 			{
@@ -83,120 +90,135 @@ namespace Minicop.Game.GravityRave
 		}
 		public void DataBaseClose()
 		{
-			if (conn != null)
-			{
-				if (conn.State.ToString() != "Closed")
-				{
-					conn.Close();
-					Debug.Log($"Connect closed");
-				}
-				conn.Dispose();
-			}
-		}
-
-		//#if DEVELOPMENT_BUILD || UNITY_EDITOR
-		public void CheckUser(NetworkIdentity networkIdentity, string password, string login)
-		{
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
 			try
 			{
-				DataBaseOpen();
-				try
+				if (_conn != null)
 				{
-					IDbCommand cmd = conn.CreateCommand();
-					string sql =
-					$"SELECT Id,Login FROM user WHERE Password = '{password}' AND Login = '{login}';";
-					cmd.CommandText = sql;
-
-					IDataReader reader = cmd.ExecuteReader();
-
-					int results = 0;
-					while (reader.Read())
+					if (_conn.State.ToString() != "Closed")
 					{
-						results += (int)reader["Id"];
-						Id = (int)reader["Id"];
-
+						_conn.Close();
+						Debug.Log($"Connect closed");
 					}
-					if (results == 0)
-					{
-						Debug.Log($"Email and password incorect");
-						return;
-					}
-
-					Debug.Log($"Email and password access");
-					OnAccept.Invoke(networkIdentity);
-					//_networkManager.LeaveOfRoom(networkIdentity);
+					_conn.Dispose();
 				}
-				catch (Exception ex)
-				{
-					Debug.Log($"{ex.ToString()}");
-				}
-				DataBaseClose();
 			}
 			catch (Exception ex)
 			{
 				Debug.Log($"{ex.ToString()}");
 			}
+#endif
 		}
-		//#endif
+
+		public void CheckUser(NetworkIdentity networkIdentity, string email, string password, string login)
+		{
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
+			DataBaseOpen();
+
+			try
+			{
+				MySqlCommand cmd = _conn.CreateCommand();
+				cmd.CommandText = $"SELECT COUNT(*) AS IsBusy FROM users WHERE Email = '{email}' AND Login = '{login}' AND Password = '{password}';";
+
+				MySqlDataReader rdr = cmd.ExecuteReader();
+				if (rdr.HasRows)
+				{
+					while (rdr.Read())
+					{
+						int count = rdr.GetInt32("IsBusy");
+						if (count != 0)
+						{
+							Debug.Log("Login, Email, and Password correct");
+							RegisterAllowed.Invoke(networkIdentity);
+							DataBaseClose();
+							return;
+						}
+						else
+						{
+							Debug.Log($"Login, Email, or Password incorrect");
+							DataBaseClose();
+							return;
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Debug.Log($"{ex.ToString()}");
+			}
+			DataBaseClose();
+#endif
+		}
 
 		[Server]
 		public void SaveUser(NetworkIdentity networkIdentity, string email, string password, string login)
 		{
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
+			DataBaseOpen();
+
 			try
 			{
-				try
+				MySqlCommand cmd = _conn.CreateCommand();
+				cmd.CommandText = $"SELECT COUNT(*) AS IsBusy FROM users WHERE Email = '{email}' OR Login = '{login}';";
+
+				MySqlDataReader rdr = cmd.ExecuteReader();
+				if (rdr.HasRows)
 				{
-					DataBaseOpen();
-
-					IDbCommand cmd = conn.CreateCommand();
-					string sql =
-					$"SELECT Id FROM user WHERE Password = '{password}' AND Login = '{login}';";
-					cmd.CommandText = sql;
-
-					IDataReader reader = cmd.ExecuteReader();
-
-					int results = 0;
-					while (reader.Read())
+					while (rdr.Read())
 					{
-						results += (int)reader["Id"];
-						Id = (int)reader["Id"];
+						int count = rdr.GetInt32("IsBusy");
+						if (count != 0)
+						{
+							Debug.Log("Login or Email is busy");
+							DataBaseClose();
+							return;
+						}
+						else
+							Debug.Log($"Login and Email not busy");
 					}
-					if (results != 0)
-					{
-						Debug.Log($"Login busy");
-						return;
-					}
-
-					Debug.Log($"Login not busy");
-
-					Debug.Log($"query access = INSERT INTO users(Email, Password,Login) VALUES (?Email, ?Password,?Login);");
-					string query = "INSERT INTO user(Email, Password, Login) VALUES (?Email, ?Password,?Login);";
-
-					Debug.Log($"Data inserting...");
-					MySqlCommand cmd2 = new MySqlCommand(query, conn);
-					cmd2.Parameters.Add("?Email", MySqlDbType.VarChar).Value = email;
-					cmd2.Parameters.Add("?Password", MySqlDbType.VarChar).Value = password;
-					cmd2.Parameters.Add("?Login", MySqlDbType.VarChar).Value = login;
-					cmd2.ExecuteNonQuery();
-
-					DataBaseClose();
-
-					Debug.Log($"Player {networkIdentity.netId}");
-					OnAccept.Invoke(networkIdentity);
-					//_networkManager.LeaveOfRoom(networkIdentity);
 				}
-				catch (MySqlException ex)
-				{
-					Debug.Log($"Error in adding mysql row. Error: + {ex.Message}");
-				}
-
-				return;
-				//string sql = $"INSERT INTO users(Email, Password, Login) VALUES({email}, {password}, {login})";
 			}
 			catch (Exception ex)
 			{
 				Debug.Log($"{ex.ToString()}");
 			}
+			DataBaseClose();
+
+			DataBaseOpen();
+			try
+			{
+				Debug.Log($"Login and Email not busy");
+
+				Debug.Log($"Data inserting...");
+
+				string query = "INSERT INTO users(Email, Password, Login) VALUES (?Email, ?Password,?Login);";
+				MySqlCommand cmd = new MySqlCommand(query, _conn);
+				cmd.Parameters.Add("?Email", MySqlDbType.VarChar).Value = email;
+				cmd.Parameters.Add("?Password", MySqlDbType.VarChar).Value = password;
+				cmd.Parameters.Add("?Login", MySqlDbType.VarChar).Value = login;
+				cmd.ExecuteNonQuery();
+			}
+			catch (Exception ex)
+			{
+				Debug.Log($"{ex.ToString()}");
+			}
+
+			DataBaseClose();
+
+			EnterAllowed.Invoke(networkIdentity);
+#endif
+		}
+
+		public static DataStruct Data = new DataStruct();
+		[System.Serializable]
+		public struct DataStruct
+		{
+			public bool IsActive;
+			public string IpAdress;
+			public string Port;
+			public string Name;
+			public string UserName;
+			public string UserPassword;
 		}
 	}
 

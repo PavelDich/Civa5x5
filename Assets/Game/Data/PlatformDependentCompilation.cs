@@ -17,6 +17,9 @@ namespace Minicop.Game.GravityRave
 
         private void Start()
         {
+            Debug.Log($"Has ({Data.IpAdress}:{Data.Port})");
+            JSONController.Load(ref Data, "NetworkData");
+            Debug.Log($"Has2 ({Data.IpAdress}:{Data.Port})");
 #if UNITY_EDITOR
             CreateServer();
             ConnectServer();
@@ -33,13 +36,11 @@ namespace Minicop.Game.GravityRave
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
             try
             {
-                Debug.Log($"Server at {Config.Data.IpAdress}: {Config.Data.PortAdress} creating...");
-                ushort.TryParse(Config.Data.PortAdress, out _kcpTransport.port);
                 Create();
             }
             catch
             {
-                Debug.Log($"Port {Config.Data.PortAdress} denied");
+                Debug.Log($"Port denied");
             }
 #endif
         }
@@ -54,9 +55,8 @@ namespace Minicop.Game.GravityRave
         {
             while (true)
             {
-                Debug.Log($"Wait to connect ({Config.Data.IpAdress}:{Config.Data.PortAdress})");
-                ushort.TryParse(Config.Data.PortAdress, out _kcpTransport.port);
-                _networkManager.Connect(Config.Data.IpAdress);
+                Debug.Log($"Wait to connect ({Data.IpAdress}:{Data.Port})");
+                _networkManager.Connect(Data.IpAdress);
                 yield return new WaitForSeconds(0.5f);
             }
         }
@@ -68,7 +68,7 @@ namespace Minicop.Game.GravityRave
             {
                 if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
                 {
-                    //if (_field.IpAdress != null) Config.Data.IpAdress = ip.ToString();
+                    //ip.ToString();
                     yield return null;
                 }
                 yield return null;
@@ -88,6 +88,18 @@ namespace Minicop.Game.GravityRave
         public void Exit()
         {
             Application.Quit();
+        }
+
+        public static DataStruct Data = new DataStruct
+        {
+            Port = "49001",
+            IpAdress = "localhost",
+        };
+        [System.Serializable]
+        public struct DataStruct
+        {
+            public string Port;
+            public string IpAdress;
         }
     }
 }
