@@ -11,19 +11,7 @@ namespace Minicop.Game.GravityRave
 {
     public class Alive : NetworkBehaviour, IDamageble, IData
     {
-        #region  System
-        private void Start()
-        {
-            if (!NetworkClient.active) return;
-            OnHealthChanged.AddListener(Regenerate);
-        }
-        #endregion
-
-
-
         #region Health
-        [SerializeField]
-        public UnityEvent<float, float, float, float> OnHealthChanged = new UnityEvent<float, float, float, float>();
         public UnityEvent OnDeath = new UnityEvent();
         public float HealthMax
         {
@@ -44,77 +32,24 @@ namespace Minicop.Game.GravityRave
             }
         }
 
+        [Server]
         public void Damage(NetworkIdentity shooter, float damage)
         {
             Health -= damage;
-            CmdSyncData(_data);
-        }
-        #endregion
-
-
-
-        #region Regeneration
-        public float RegenerationDelay
-        {
-            get { return _data.RegenerationDelay; }
-            set { _data.RegenerationDelay = value; }
-        }
-        public float RegenerationPerSecond
-        {
-            get { return _data.RegenerationPerSecond; }
-            set { _data.RegenerationPerSecond = value; }
-        }
-        [SerializeField, HideInInspector]
-        private Coroutine ActiveRegenerator;
-        public void Regenerate(float oldValue, float newValue, float oldMax, float newMax)
-        {
-            if (newValue > oldValue) return;
-            if (ActiveRegenerator != null)
-            {
-                StopCoroutine(ActiveRegenerator);
-            }
-            ActiveRegenerator = StartCoroutine(Start());
-
-            IEnumerator Start()
-            {
-                yield return new WaitForSeconds(RegenerationDelay);
-                while (Health < HealthMax && RegenerationPerSecond != 0)
-                {
-                    yield return new WaitForEndOfFrame();
-                    Health += RegenerationPerSecond * Time.deltaTime;
-                    CmdSyncData(_data);
-                }
-                yield break;
-            }
         }
         #endregion
 
 
 
         #region Network
-        [SyncVar(hook = (nameof(OnSyncData)))]
+        [SyncVar]
         [SerializeField]
         private Data _data = new Data();
-        private void OnSyncData(Data oldValue, Data newValue)
-        {
-            _data = newValue;
-        }
-        public void SyncData()
-        {
-            CmdSyncData(_data);
-        }
-        [Command(requiresAuthority = false)]
-        public void CmdSyncData(Data value)
-        {
-            _data = value;
-        }
         [System.Serializable]
         public struct Data
         {
             public float HealthMax;
             public float Health;
-            public float RegenerationPerSecond;
-            public float RegenerationDelay;
         }
         #endregion
 
@@ -136,8 +71,6 @@ namespace Minicop.Game.GravityRave
         {
             writer.WriteFloat(item.Health);
             writer.WriteFloat(item.HealthMax);
-            writer.WriteFloat(item.RegenerationDelay);
-            writer.WriteFloat(item.RegenerationPerSecond);
         }
 
         public static Alive.Data Read(this NetworkReader reader)
@@ -146,8 +79,6 @@ namespace Minicop.Game.GravityRave
             {
                 Health = reader.ReadFloat(),
                 HealthMax = reader.ReadFloat(),
-                RegenerationDelay = reader.ReadFloat(),
-                RegenerationPerSecond = reader.ReadFloat(),
             };
         }
     }

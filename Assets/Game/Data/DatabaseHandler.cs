@@ -18,13 +18,12 @@ namespace Minicop.Game.GravityRave
 {
 	public class DatabaseHandler : MonoBehaviour
 	{
-		public UnityEvent<NetworkIdentity> RegisterDenied = new UnityEvent<NetworkIdentity>();
-		public UnityEvent<NetworkIdentity> RegisterAllowed = new UnityEvent<NetworkIdentity>();
-		public UnityEvent<NetworkIdentity> EnterDenied = new UnityEvent<NetworkIdentity>();
-		public UnityEvent<NetworkIdentity> EnterAllowed = new UnityEvent<NetworkIdentity>();
+		public UnityEvent<NetworkIdentity> OnRegisterDenied = new UnityEvent<NetworkIdentity>();
+		public UnityEvent<NetworkIdentity> OnRegisterAllowed = new UnityEvent<NetworkIdentity>();
+		public UnityEvent<NetworkIdentity> OnEnterDenied = new UnityEvent<NetworkIdentity>();
+		public UnityEvent<NetworkIdentity> OnEnterAllowed = new UnityEvent<NetworkIdentity>();
 		[Inject]
 		public NetworkManager _networkManager;
-		private string _connectionString;
 		private MySqlConnection _conn = null;
 		public int Id;
 
@@ -129,7 +128,7 @@ namespace Minicop.Game.GravityRave
 						if (count != 0)
 						{
 							Debug.Log("Login, Email, and Password correct");
-							RegisterAllowed.Invoke(networkIdentity);
+							OnRegisterAllowed.Invoke(networkIdentity);
 							DataBaseClose();
 							return;
 						}
@@ -205,7 +204,7 @@ namespace Minicop.Game.GravityRave
 
 			DataBaseClose();
 
-			EnterAllowed.Invoke(networkIdentity);
+			OnEnterAllowed.Invoke(networkIdentity);
 #endif
 		}
 

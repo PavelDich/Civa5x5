@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8833049196bc4ef4da99e22a8e787c27, type: 3}
+  m_Name: InputSettings
+  m_EditorClassIdentifier: 
+  <menu>k__BackingField:
+    <Open>k__BackingField: 27
+  <move>k__BackingField:
+    <SensativityX>k__BackingField: 100
+    <SensativityY>k__BackingField: 100
+    <Sprint>k__BackingField: 304
+    <Crawl>k__BackingField: 306
+    <Forward>k__BackingField: 119
+    <Back>k__BackingField: 115
+    <Left>k__BackingField: 97
+    <Right>k__BackingField: 100
+    <Jump>k__BackingField: 32
+  <Inventory>k__BackingField:
+    <Switch>k__BackingField: 
+    <Grab>k__BackingField: 0
+    <Put>k__BackingField: 0
+    <Drop>k__BackingField: 0
+  <item>k__BackingField:
+    <Click>k__BackingField: 323
+    <AltClick>k__BackingField: 324
+    <Reload>k__BackingField: 114
+  Interact: 102

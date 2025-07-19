@@ -17,9 +17,7 @@ namespace Minicop.Game.GravityRave
 
         private void Start()
         {
-            Debug.Log($"Has ({Data.IpAdress}:{Data.Port})");
             JSONController.Load(ref Data, "NetworkData");
-            Debug.Log($"Has2 ({Data.IpAdress}:{Data.Port})");
 #if UNITY_EDITOR
             CreateServer();
             ConnectServer();
@@ -40,7 +38,7 @@ namespace Minicop.Game.GravityRave
             }
             catch
             {
-                Debug.Log($"Port denied");
+                //Debug.Log($"Port denied");
             }
 #endif
         }
@@ -55,7 +53,7 @@ namespace Minicop.Game.GravityRave
         {
             while (true)
             {
-                Debug.Log($"Wait to connect ({Data.IpAdress}:{Data.Port})");
+                //Debug.Log($"Wait to connect ({Data.IpAdress}:{Data.Port})");
                 _networkManager.Connect(Data.IpAdress);
                 yield return new WaitForSeconds(0.5f);
             }

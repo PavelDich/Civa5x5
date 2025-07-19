@@ -21,8 +21,6 @@ namespace Minicop.Game.GravityRave
         public NetworkManager _networkManager;
         [SerializeField]
         private static NetworkIdentity _localConnection;
-        [SerializeField]
-        private Transform[] _spawns;
         public static NetworkIdentity LocalConnection
         {
             get
@@ -39,61 +37,72 @@ namespace Minicop.Game.GravityRave
         public List<NetworkIdentity> Connections = new List<NetworkIdentity>();
         public UnityEvent OnLocalConnectionLeave = new UnityEvent();
         public UnityEvent OnLocalConnectionEnter = new UnityEvent();
-        public UnityEvent OnConnectionEnter = new UnityEvent();
+        public UnityEvent<NetworkIdentity> OnConnectionEnter = new UnityEvent<NetworkIdentity>();
         public UnityEvent OnConnectionLeave = new UnityEvent();
-        [SyncVar]
-        public int RoomId = 0;
-        [SyncVar]
-        public int SceneId = 0;
+        public int SceneId
+        {
+            get { return _data.SceneId; }
+            set { _data.SceneId = value; }
+        }
 
         private void Start()
         {
+            if (!NetworkServer.active) return;
             NetworkManager.OnPlayerDisconnect.AddListener(SrvRemovePlayer);
         }
 
         private void OnEnable()
         {
-            StartCoroutine(WaitSpawnPlayer());
-            OnLocalConnectionEnter.Invoke();
+            if (!NetworkClient.active) return;
+            StartCoroutine(WaitSpawnConnection());
         }
 
         private void OnDisable()
         {
+            if (!NetworkClient.active) return;
+            CmdRemoveConnection(LocalConnection);
             OnLocalConnectionLeave.Invoke();
         }
 
-        public IEnumerator WaitSpawnPlayer()
+        public IEnumerator WaitSpawnConnection()
         {
             yield return new WaitForEndOfFrame();
-            FindPlayers();
-        }
-        public void FindPlayers()
-        {
-            if (!NetworkClient.active) return;
-            CmdFindPlayers();
+            GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+            foreach (GameObject player in players)
+            {
+                NetworkIdentity networkIdentity = player.GetComponent<NetworkIdentity>();
+                if (networkIdentity.isOwned)
+                {
+                    LocalConnection = networkIdentity;
+                    CmdAddConnection(networkIdentity);
+                    break;
+                }
+            }
+            OnLocalConnectionEnter.Invoke();
         }
         [Command(requiresAuthority = false)]
-        public void CmdFindPlayers()
+        public void CmdAddConnection(NetworkIdentity networkIdentity)
         {
-            GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-            foreach (GameObject p in players)
+            Connections.Add(networkIdentity);
+            foreach (NetworkIdentity connection in Connections)
+                RpcConnectionEnter(connection.connectionToClient, networkIdentity);
+        }
+        [Command(requiresAuthority = false)]
+        void CmdRemoveConnection(NetworkIdentity networkIdentity)
+        {
+            StartCoroutine(Remove());
+            IEnumerator Remove()
             {
-                NetworkIdentity networkIdentity = p.GetComponent<NetworkIdentity>();
-                RpcPlayerEnter(networkIdentity.connectionToClient);
-                RpcFindLocalPlayers(networkIdentity.connectionToClient, networkIdentity);
+                yield return new WaitForEndOfFrame();
+                Connections.Remove(networkIdentity);
+                Connections.RemoveAll(p => p == null);
             }
         }
 
         [TargetRpc]
-        public void RpcPlayerEnter(NetworkConnectionToClient conn)
+        public void RpcConnectionEnter(NetworkConnection networkConnection, NetworkIdentity networkIdentity)
         {
-            OnConnectionEnter.Invoke();
-        }
-        [TargetRpc]
-        public void RpcFindLocalPlayers(NetworkConnectionToClient conn, NetworkIdentity localPlayer)
-        {
-            Debug.Log("Find");
-            LocalConnection = localPlayer;
+            OnConnectionEnter.Invoke(networkIdentity);
         }
 
         [Server]
@@ -107,18 +116,45 @@ namespace Minicop.Game.GravityRave
             }
         }
 
-        [Server]
-        public void SrvRemovePlayer(NetworkIdentity networkIdentity)
-        {
-            NetworkIdentity player = Connections.Find(player => player.connectionToClient == networkIdentity.connectionToClient);
-            Connections.Remove(player);
-            Destroy(player.gameObject);
-            NetworkServer.Destroy(player.gameObject);
-        }
-
         public void Quit()
         {
             Application.Quit();
+        }
+        #region Network
+        [SyncVar]
+        [SerializeField]
+        private Data _data = new Data();
+        [System.Serializable]
+        public struct Data
+        {
+            public int SceneId;
+        }
+        #endregion
+
+
+        public object GetData()
+        {
+            return _data;
+        }
+        public void SetData(object data)
+        {
+            _data = (NetworkLevel.Data)data;
+        }
+    }
+
+    public static class NetworkLevelSerializer
+    {
+        public static void Write(this NetworkWriter writer, NetworkLevel.Data item)
+        {
+            writer.WriteInt(item.SceneId);
+        }
+
+        public static NetworkLevel.Data Read(this NetworkReader reader)
+        {
+            return new NetworkLevel.Data
+            {
+                SceneId = reader.ReadInt(),
+            };
         }
     }
 }

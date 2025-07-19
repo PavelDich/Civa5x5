@@ -26,6 +26,11 @@ namespace Minicop.Game.GravityRave
         [Command(requiresAuthority = false)]
         private void CmdPlay()
         {
+            SrvPlay();
+        }
+        [Server]
+        public void SrvPlay()
+        {
             foreach (NetworkIdentity player in _networkLevel.Connections)
             {
                 RpcPlay(player.connectionToClient);
